@@ -1,26 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data;
-using System.Xml.Linq;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BelajarKoneksi;
-
-public class Region
+public class Department
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    
-    // GET ALL Region
-    public List<Region> GetAll()
-    {   // inisialisasi regions untuk list object Region
-        var regions = new List<Region>();
+    public int LocationId { get; set; }
+    public int ManagerId { get; set; }
+
+    // GET ALL Department
+    public List<Department> GetAll()
+    {   // inisialisasi departments untuk list object Department
+        var departments = new List<Department>();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions"; // Query Select tabel regions
+        command.CommandText = "SELECT * FROM departments"; // Query Select tabel regions
 
         try
         {
@@ -28,45 +31,47 @@ public class Region
             // mengeksekusi query dan return data atau melakukan datareader
             using var reader = command.ExecuteReader();
             // Cek ada data atau tidak
-            if (reader.HasRows) 
+            if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // menambahkan region dari tabel ke list
-                    regions.Add(new Region
+                while (reader.Read()) // loping data dari tabel departments
+                {   // menambahkan department dari tabel ke list
+                    departments.Add(new Department
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
+                        Name = reader.GetString(1),
+                        LocationId = reader.GetInt32(0),
+                        ManagerId = reader.GetInt32(0),
                     });
                 }
                 reader.Close(); // menutup datareader atau reader
                 connection.Close(); // tutup koneksi
 
-                return regions; // mereturn list regions
+                return departments; // mereturn list departments
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
             // mereturn list  kosong
-            return new List<Region>(); 
+            return new List<Department>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new List<Region>(); // mereturn list kosong
+        return new List<Department>(); // mereturn list kosong
 
     }
 
-    // GET BY ID: Region
-    public Region GetById(int id)
-    {   // inisialisasi region
-        var region = new Region();
+    // GET BY ID: Department
+    public Department GetById(int id)
+    {   // inisialisasi department
+        var department = new Department();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "SELECT * FROM departments WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
@@ -77,16 +82,18 @@ public class Region
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // memasukkan data ke objek region
-                    region.Id = reader.GetInt32(0); 
-                    region.Name = reader.GetString(1);
+                while (reader.Read()) // loping data dari tabel departments
+                {   // memasukkan data ke objek department
+                    department.Id = reader.GetInt32(0);
+                    department.Name = reader.GetString(1);
+                    department.LocationId = reader.GetInt32(2);
+                    department.ManagerId = reader.GetInt32(3);
                     reader.Close(); // menutup datareader atau reader
                     connection.Close(); // tutup koneksi
 
-                    return region; //mereturn objek region
+                    return department; //mereturn objek department
                 }
-                
+
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
@@ -98,8 +105,9 @@ public class Region
         }
         return null; //mereturn null
     }
-    // INSERT: Region
-    public string Insert(string name)
+    // INSERT: Department
+    public string Insert
+        (int id, string name, int locationId, int managerId)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -107,11 +115,18 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "INSERT INTO regions VALUES (@name);"; // Query
+        command.CommandText = 
+            "INSERT INTO departments VALUES (@id, @name, @location_id, @manager_id);"; // Query
 
         try
-        {   // Mengisi parameter @name ke query yang sudah dibuat diatas
+        {   // Mengisi parameter @id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@id", id));
+            // Mengisi parameter @name ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@name", name));
+            // Mengisi parameter @location_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@location_id", locationId));
+            // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -136,8 +151,9 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // UPDATE: Region
-    public string Update(int id, string name)
+    // UPDATE: Department
+    public string Update
+        (int id, string name, int locationId, int managerId)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -145,15 +161,19 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "UPDATE regions SET name=@name WHERE id=@id;"; // Query
+        command.CommandText =
+            "UPDATE departments SET name=@name,location_id=@location_id, manager_id=@manager_id WHERE id=@id;"; // Query
 
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@id", id));
-
             // Mengisi parameter @name ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@name", name));
+            // Mengisi parameter @location_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@location_id", locationId));
+            // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -178,7 +198,7 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // DELETE: Region
+    // DELETE: Department
     public string Delete(int id)
     {
         // inisialiasi command  
@@ -187,7 +207,7 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "DELETE FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "DELETE FROM departments WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@id", id));

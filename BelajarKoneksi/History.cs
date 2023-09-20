@@ -1,26 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data;
-using System.Xml.Linq;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BelajarKoneksi;
-
-public class Region
+public class History
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    
-    // GET ALL Region
-    public List<Region> GetAll()
-    {   // inisialisasi regions untuk list object Region
-        var regions = new List<Region>();
+    public DateTime StartDate { get; set; }
+    public int EmployeeId { get; set; }
+    public DateTime EndDate { get; set; }
+    public int DepartmentId  { get; set; }
+    public string JobId { get; set; }
+
+    // GET ALL History
+    public List<History> GetAll()
+    {   // inisialisasi history untuk list object History
+        var histories = new List<History>();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions"; // Query Select tabel regions
+        command.CommandText = "SELECT * FROM histories"; // Query Select tabel regions
 
         try
         {
@@ -28,65 +32,74 @@ public class Region
             // mengeksekusi query dan return data atau melakukan datareader
             using var reader = command.ExecuteReader();
             // Cek ada data atau tidak
-            if (reader.HasRows) 
+            if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // menambahkan region dari tabel ke list
-                    regions.Add(new Region
+                while (reader.Read()) // loping data dari tabel histories
+                {   // menambahkan history dari tabel ke list
+                    histories.Add(new History
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
+                        StartDate = reader.GetDateTime(0),
+                        EmployeeId = reader.GetInt32(1),
+                        EndDate = reader.GetDateTime(2),
+                        DepartmentId = reader.GetInt32(3),
+                        JobId = reader.GetString(4)
                     });
                 }
                 reader.Close(); // menutup datareader atau reader
                 connection.Close(); // tutup koneksi
 
-                return regions; // mereturn list regions
+                return histories; // mereturn list regions
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
             // mereturn list  kosong
-            return new List<Region>(); 
+            return new List<History>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new List<Region>(); // mereturn list kosong
+        return new List<History>(); // mereturn list kosong
 
     }
 
-    // GET BY ID: Region
-    public Region GetById(int id)
+    // GET BY ID: History
+    public History GetByDateAndEmployeeId(DateTime startDate, int employeeId)
     {   // inisialisasi region
-        var region = new Region();
+        var history = new History();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "SELECT * FROM histories WHERE " +
+            "start_date=@start_date AND employee_id=@employee_id;"; // Query
 
         try
-        {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+        {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // memasukkan data ke objek region
-                    region.Id = reader.GetInt32(0); 
-                    region.Name = reader.GetString(1);
+                while (reader.Read()) // loping data dari tabel histories
+                {   // memasukkan data ke objek histries
+                    history.StartDate = reader.GetDateTime(0);
+                    history.EmployeeId = reader.GetInt32(1);
+                    history.EndDate = reader.GetDateTime(2);
+                    history.DepartmentId = reader.GetInt32(3);
+                    history.JobId = reader.GetString(4);
                     reader.Close(); // menutup datareader atau reader
                     connection.Close(); // tutup koneksi
 
-                    return region; //mereturn objek region
+                    return history; //mereturn objek history
                 }
-                
+
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
@@ -98,8 +111,9 @@ public class Region
         }
         return null; //mereturn null
     }
-    // INSERT: Region
-    public string Insert(string name)
+    // INSERT: History
+    public string Insert
+        (DateTime startDate, int employeeId, DateTime endDate, int  departmentId, int jobId)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -107,11 +121,20 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "INSERT INTO regions VALUES (@name);"; // Query
+        command.CommandText = "INSERT INTO histories VALUES (" +
+            "@start_date, @employee_id, @end_date, @department_id, @job_id);"; // Query
 
         try
-        {   // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+        {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            // Mengisi parameter @end_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@end_date", endDate));
+            // Mengisi parameter @department_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            // Mengisi parameter @job_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@job_id", jobId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -136,8 +159,9 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // UPDATE: Region
-    public string Update(int id, string name)
+    // UPDATE: History
+    public string Update
+        (DateTime startDate, int employeeId, DateTime endDate, int departmentId, int jobId)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -145,15 +169,22 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "UPDATE regions SET name=@name WHERE id=@id;"; // Query
+        command.CommandText = "UPDATE histories SET " +
+            "end_date=@end_date, department_id=@department_id" +
+            "job_id=@job_id WHERE start_date=@start_date AND employee_id=@employee_id;"; // Query
 
         try
         {
-            // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
-
-            // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            // Mengisi parameter @start_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            // Mengisi parameter @end_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@end_date", endDate));
+            // Mengisi parameter @department_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            // Mengisi parameter @job_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@job_id", jobId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -178,8 +209,8 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // DELETE: Region
-    public string Delete(int id)
+    // DELETE: History
+    public string Delete(DateTime startDate, int employeeId)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -187,10 +218,12 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "DELETE FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "DELETE FROM histories WHERE start_date=@start_date AND employee_id=@employee_id;"; // Query
         try
-        {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+        {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

@@ -1,26 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace BelajarKoneksi;
-
-public class Region
+public class Job
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    
-    // GET ALL Region
-    public List<Region> GetAll()
-    {   // inisialisasi regions untuk list object Region
-        var regions = new List<Region>();
+    public string Id { get; set; }
+    public string Title { get; set; }
+    public int MinSalary { get; set; }
+    public int MaxSalary { get; set; }
+
+    // GET ALL Job
+    public List<Job> GetAll()
+    {   // inisialisasi jobs untuk list object Job
+        var jobs = new List<Job>();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions"; // Query Select tabel regions
+        command.CommandText = "SELECT * FROM jobs"; // Query Select tabel jobs
 
         try
         {
@@ -28,45 +32,47 @@ public class Region
             // mengeksekusi query dan return data atau melakukan datareader
             using var reader = command.ExecuteReader();
             // Cek ada data atau tidak
-            if (reader.HasRows) 
+            if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // menambahkan region dari tabel ke list
-                    regions.Add(new Region
+                while (reader.Read()) // loping data dari tabel jobs
+                {   // menambahkan jobs dari tabel ke list
+                    jobs.Add(new Job
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
+                        Id = reader.GetString(0),
+                        Title = reader.GetString(1),
+                        MinSalary = reader.GetInt32(2),
+                        MaxSalary = reader.GetInt32(3)
                     });
                 }
                 reader.Close(); // menutup datareader atau reader
                 connection.Close(); // tutup koneksi
 
-                return regions; // mereturn list regions
+                return jobs; // mereturn list jobs
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
             // mereturn list  kosong
-            return new List<Region>(); 
+            return new List<Job>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new List<Region>(); // mereturn list kosong
+        return new List<Job>(); // mereturn list kosong
 
     }
 
-    // GET BY ID: Region
-    public Region GetById(int id)
-    {   // inisialisasi region
-        var region = new Region();
+    // GET BY ID: Job
+    public Job GetById(int id)
+    {   // inisialisasi job
+        var job = new Job();
         // inisialiasi command  
         using var command = new SqlCommand();
         // inisialisasi connection untuk koneksi ke database
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "SELECT * FROM jobs WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
@@ -77,16 +83,18 @@ public class Region
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // memasukkan data ke objek region
-                    region.Id = reader.GetInt32(0); 
-                    region.Name = reader.GetString(1);
+                while (reader.Read()) // loping data dari tabel jobs
+                {   // memasukkan data ke objek job
+                    job.Id = reader.GetString(0);
+                    job.Title = reader.GetString(1);
+                    job.MinSalary = reader.GetInt32(2);
+                    job.MaxSalary = reader.GetInt32(3);
                     reader.Close(); // menutup datareader atau reader
                     connection.Close(); // tutup koneksi
 
-                    return region; //mereturn objek region
+                    return job; //mereturn objek job
                 }
-                
+
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
@@ -98,8 +106,9 @@ public class Region
         }
         return null; //mereturn null
     }
-    // INSERT: Region
-    public string Insert(string name)
+    // INSERT: Job
+    public string Insert
+        (string id, string title, string minSalary, string maxSalary)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -107,11 +116,17 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "INSERT INTO regions VALUES (@name);"; // Query
+        command.CommandText = "INSERT INTO jobs VALUES (@id, @title, @min_salary, @max_salary);"; // Query
 
         try
-        {   // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+        {   // Mengisi parameter @id ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@id", id));
+            // Mengisi parameter @title ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@title", title));
+            // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@min_salary", minSalary));
+            // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@max_salary", maxSalary));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -136,8 +151,9 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // UPDATE: Region
-    public string Update(int id, string name)
+    // UPDATE: Job
+    public string Update
+        (string id, string title, string minSalary, string maxSalary)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -145,15 +161,18 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "UPDATE regions SET name=@name WHERE id=@id;"; // Query
+        command.CommandText = "UPDATE jobs SET title=@title, min_salary=@min_salary, max_salary=@max_salary  WHERE id=@id;"; // Query
 
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@id", id));
-
-            // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            // Mengisi parameter @title ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@title", title));
+            // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@min_salary", minSalary));
+            // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
+            command.Parameters.Add(new SqlParameter("@max_salary", maxSalary));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -178,8 +197,9 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // DELETE: Region
-    public string Delete(int id)
+    // DELETE: Job
+    public string Delete
+        (string id)
     {
         // inisialiasi command  
         using var command = new SqlCommand();
@@ -187,7 +207,7 @@ public class Region
         var connection = DatabaseManager.GetConnection();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "DELETE FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "DELETE FROM jobs WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(new SqlParameter("@id", id));
@@ -216,3 +236,4 @@ public class Region
         }
     }
 }
+
