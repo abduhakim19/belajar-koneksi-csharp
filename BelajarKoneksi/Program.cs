@@ -106,7 +106,7 @@ public class Program
                                         CountryName = c.Name,
                                         RegionName = r.Name
                                     }).ToList();
-                GeneralMenu.List(employeeJoin, "regions and countries");
+                GeneralMenu.List(employeeJoin, "List Employee, Departments, Locations, Countries, and Regions");
                 break;
 
             case "9":
@@ -119,7 +119,7 @@ public class Program
 
                 // Group by Employee berdasarkan DepartmentId yang akan dimasukkan ke variabel g
                 // join department berdasarkan g.Key => e.DepartmentId dari variabel g
-                var coba = (from e in getEmployee9
+                var employeeByDepartment = (from e in getEmployee9
                             group e by e.DepartmentId into g
                             join d in getDepartment9 on g.Key equals d.Id
                             where g.Count() > 3 // mengecek departemetn dengan total employee lebih dari 3
@@ -131,7 +131,7 @@ public class Program
                                 MinSalary = g.Min(m => m.Salary), // min salary berdasarkan DepartmentId
                                 AvgSalary = g.Average(a => a.Salary), // avg salary berdasarkan DepartmentId
                             }).ToList();
-                GeneralMenu.List(coba, "regions and countries");
+                GeneralMenu.List(employeeByDepartment, "Total Employee by Department with Min, Max, Avg Salary");
                 break;
 
             default:
