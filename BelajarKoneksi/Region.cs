@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Data;
 using System.Xml.Linq;
 
@@ -9,15 +8,20 @@ public class Region
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    
+
+    public override string ToString()
+    {
+        return $"{Id} - {Name}";
+    }
+
     // GET ALL Region
     public List<Region> GetAll()
     {   // inisialisasi regions untuk list object Region
         var regions = new List<Region>();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM regions"; // Query Select tabel regions
@@ -28,7 +32,7 @@ public class Region
             // mengeksekusi query dan return data atau melakukan datareader
             using var reader = command.ExecuteReader();
             // Cek ada data atau tidak
-            if (reader.HasRows) 
+            if (reader.HasRows)
             {
                 while (reader.Read()) // loping data dari tabel regions
                 {   // menambahkan region dari tabel ke list
@@ -45,8 +49,6 @@ public class Region
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            // mereturn list  kosong
-            return new List<Region>(); 
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
@@ -60,58 +62,51 @@ public class Region
     public Region GetById(int id)
     {   // inisialisasi region
         var region = new Region();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM regions WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // memasukkan data ke objek region
-                    region.Id = reader.GetInt32(0); 
-                    region.Name = reader.GetString(1);
-                    reader.Close(); // menutup datareader atau reader
-                    connection.Close(); // tutup koneksi
+                reader.Read();
+                region.Id = reader.GetInt32(0);
+                region.Name = reader.GetString(1);
+                reader.Close(); // menutup datareader atau reader
 
-                    return region; //mereturn objek region
-                }
-                
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            return null; //mereturn null
+            return region; //mereturn objek region
         }
         catch (Exception ex)
         {    // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return null; //mereturn null
+        return new Region(); //mereturn objek region kosong
     }
     // INSERT: Region
     public string Insert(string name)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
-
-        command.Connection = connection; // menghubungkan command dan database 
+        using var command = Provider.GetCommand();
         command.CommandText = "INSERT INTO regions VALUES (@name);"; // Query
 
         try
         {   // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -139,10 +134,10 @@ public class Region
     // UPDATE: Region
     public string Update(int id, string name)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "UPDATE regions SET name=@name WHERE id=@id;"; // Query
@@ -150,10 +145,10 @@ public class Region
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -181,16 +176,16 @@ public class Region
     // DELETE: Region
     public string Delete(int id)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM regions WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

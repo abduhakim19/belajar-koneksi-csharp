@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +17,10 @@ public class Job
     public List<Job> GetAll()
     {   // inisialisasi jobs untuk list object Job
         var jobs = new List<Job>();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM jobs"; // Query Select tabel jobs
@@ -66,17 +65,17 @@ public class Job
     public Job GetById(int id)
     {   // inisialisasi job
         var job = new Job();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM jobs WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
@@ -110,23 +109,23 @@ public class Job
     public string Insert
         (string id, string title, string minSalary, string maxSalary)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "INSERT INTO jobs VALUES (@id, @title, @min_salary, @max_salary);"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @title ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@title", title));
+            command.Parameters.Add(Provider.SetParameter("@title", title));
             // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@min_salary", minSalary));
+            command.Parameters.Add(Provider.SetParameter("@min_salary", minSalary));
             // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@max_salary", maxSalary));
+            command.Parameters.Add(Provider.SetParameter("@max_salary", maxSalary));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -155,10 +154,10 @@ public class Job
     public string Update
         (string id, string title, string minSalary, string maxSalary)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "UPDATE jobs SET title=@title, min_salary=@min_salary, max_salary=@max_salary  WHERE id=@id;"; // Query
@@ -166,13 +165,13 @@ public class Job
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @title ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@title", title));
+            command.Parameters.Add(Provider.SetParameter("@title", title));
             // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@min_salary", minSalary));
+            command.Parameters.Add(Provider.SetParameter("@min_salary", minSalary));
             // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@max_salary", maxSalary));
+            command.Parameters.Add(Provider.SetParameter("@max_salary", maxSalary));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -201,16 +200,16 @@ public class Job
     public string Delete
         (string id)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM jobs WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

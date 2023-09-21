@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+using System.Numerics;
 using System.Reflection.PortableExecutable;
 using System.Xml.Linq;
 
@@ -9,172 +9,136 @@ public class Program
 {
     private static void Main()
     {
-        //region
-        var region = new Region();
-        //var getAllRegion = region.GetAll();
-        //if (getAllRegion.Count > 0)
-        //{
-        //    foreach (var region1 in getAllRegion)
-        //    {
-        //        Console.WriteLine($"Id: {region1.Id}, Name: {region1.Name}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
+        var choice = true;
+        while (choice)
+        {
+            Console.WriteLine("1. List all regions");
+            Console.WriteLine("2. List all countries");
+            Console.WriteLine("3. List all locations");
+            Console.WriteLine("4. List all Jobs");
+            Console.WriteLine("5. List all Departments");
+            Console.WriteLine("6. List all Employees");
+            Console.WriteLine("7. List all Histories");
+            Console.WriteLine("8. List Employee, Departments, Locations, Countries, and Regions");
+            Console.WriteLine("9. Total Employee by Department with Min, Max, Avg Salary");
 
-        //var region1 = region.GetById(21);
-        //var region1 = region.GetById(25);
-        //if (region1 != null)
-        //{
-        //    Console.WriteLine($"Id: {region1.Id}, Name: {region1.Name}");
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
+            Console.WriteLine("10. Exit");
+            Console.Write("Pilihan anda: ");
+            var input = Console.ReadLine();
+            choice = Menu(input);
+        }
+    }
 
-        //var insertResult = region.Insert("Region 5");
-        //int.TryParse(insertResult, out int result);
-        //if (result > 0)
-        //{
-        //    Console.WriteLine("Insert Success");
-        //}
-        //else
-        //{
-        //    Console.WriteLine("Insert Failed");
-        //    Console.WriteLine(insertResult);
-        //}
+    public static bool Menu(string input)
+    {
+        switch (input)
+        {
+            case "1":
+                var region = new Region();
+                var regions = region.GetAll();
+                GeneralMenu.List(regions, "regions");
+                break;
 
-        //var updateResult = region.Update(22, "Region 5");
-        //int.TryParse(updateResult, out int result);
-        //if (result > 0)
-        //{
-        //    Console.WriteLine("Update Success");
-        //}
-        //else
-        //{
-        //    Console.WriteLine("Update Failed");
-        //    Console.WriteLine(updateResult);
-        //}
+            case "2":
+                var country = new Country();
+                var countries = country.GetAll();
+                GeneralMenu.List(countries, "countries");
+                break;
 
-        //var DeleteResult = region.Delete(1005);
-        //int.TryParse(DeleteResult, out int result);
-        //if (result > 0)
-        //{
-        //    Console.WriteLine("Delete Success");
-        //}
-        //else
-        //{
-        //    Console.WriteLine("Delete Failed");
-        //    Console.WriteLine(DeleteResult);
-        //}
+            case "3":
+                var location = new Location();
+                var locations = location.GetAll();
+                GeneralMenu.List(locations, "locations");
+                break;
 
+            case "4":
+                var job = new Job();
+                var jobs = job.GetAll();
+                GeneralMenu.List(jobs, "jobs");
+                break;
 
-        //country
-        var country = new Country();
+            case "5":
+                var department = new Department();
+                var departments = department.GetAll();
+                GeneralMenu.List(departments, "departments");
+                break;
 
-        //var getAllCountry = country.GetAll();
-        //if (getAllCountry.Count > 0)
-        //{
-        //    foreach (var country1 in getAllCountry)
-        //    {
-        //        Console.WriteLine($"Id: {country1.Id}, Name: {country1.Name}, RegionId: {country1.RegionId}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
+            case "6":
+                var employee = new Employee();
+                var employees = employee.GetAll();
+                GeneralMenu.List(employees, "employees");
+                break;
 
-        // Locations
-        var location = new Location();
+            case "7":
+                var history = new History();
+                var histories = history.GetAll();
+                GeneralMenu.List(histories, "histories");
+                break;
 
-        //var getAllLocation = location.GetAll();
-        //if (getAllLocation.Count > 0)
-        //{
-        //    foreach (var location1 in getAllLocation)
-        //    {
-        //        Console.WriteLine($"Id: {location1.Id}, Name: {location1.StreetAddress}, RegionId: {location1.PostalCode}, City: {location1.City}, StateProvince: {location1.StateProvince}, CountryId: {location1.CountryId}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
+            case "8":
+                // Inisialisasi
+                var employee8 = new Employee();
+                var department8 = new Department();
+                var location8 = new Location();
+                var country8 = new Country();
+                var region8 = new Region();
+                // Mengambil Data Semuanaya; GetAll()
+                var getEmployee8 = employee8.GetAll();
+                var getDepartment8 = department8.GetAll();
+                var getLocation8 = location8.GetAll();
+                var getCountry8 = country8.GetAll();
+                var getRegion8 = region8.GetAll();
+                // linq 
+                var employeeJoin = (from e in getEmployee8
+                                    join d in getDepartment8 on e.DepartmentId equals d.Id // join department
+                                    join l in getLocation8 on d.LocationId equals l.Id // join location
+                                    join c in getCountry8 on l.CountryId equals c.Id // join country
+                                    join r in getRegion8 on c.RegionId equals r.Id // join region
+                                    select new EmployeeVM
+                                    {
+                                        Id = e.Id,
+                                        FullName =$"{e.FirstName} {e.LastName}", // menyatukan firstname dan lastname
+                                        Email = e.Email,
+                                        PhoneNumber = e.PhoneNumber,
+                                        Salary = e.Salary,
+                                        DepartmentName = d.Name,
+                                        StreetAddress = l.StreetAddress,
+                                        CountryName = c.Name,
+                                        RegionName = r.Name
+                                    }).ToList();
+                GeneralMenu.List(employeeJoin, "regions and countries");
+                break;
 
-        // Departments
-        var department = new Department();
+            case "9":
+                // Inisialisasi
+                var employee9 = new Employee();
+                var department9 = new Department();
+                // Mengambil Data Semuanaya; GetAll()
+                var getEmployee9 = employee9.GetAll();
+                var getDepartment9 = department9.GetAll();
 
-        //var getAllDepartment = department.GetAll();
-        //if (getAllDepartment.Count > 0)
-        //{
-        //    foreach (var department1 in getAllDepartment)
-        //    {
-        //        Console.WriteLine($"Id: {department1.Id}, Name: {department1.Name}, LocationId: {department1.LocationId}, ManagerId: {department1.ManagerId}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
+                // Group by Employee berdasarkan DepartmentId yang akan dimasukkan ke variabel g
+                // join department berdasarkan g.Key => e.DepartmentId dari variabel g
+                var coba = (from e in getEmployee9
+                            group e by e.DepartmentId into g
+                            join d in getDepartment9 on g.Key equals d.Id
+                            where g.Count() > 3 // mengecek departemetn dengan total employee lebih dari 3
+                            select new DepartmentAndSalaryVM
+                            {
+                                DepartmentName = d.Name, // dari join department
+                                TotalEmployee = g.Count(), // total employee berdasarkan DepartmentId
+                                MaxSalary = g.Max(m => m.Salary), // max salary berdasarkan DepartmentId
+                                MinSalary = g.Min(m => m.Salary), // min salary berdasarkan DepartmentId
+                                AvgSalary = g.Average(a => a.Salary), // avg salary berdasarkan DepartmentId
+                            }).ToList();
+                GeneralMenu.List(coba, "regions and countries");
+                break;
 
-        // Employees
-        var employee = new Employee();
-
-        //var getAllEmployee = employee.GetAll();
-        //if (getAllEmployee.Count > 0)
-        //{
-        //    foreach (var employee1 in getAllEmployee)
-        //    {
-        //        Console.WriteLine($"Id: {employee1.Id}, FirstName: " +
-        //            $"{employee1.FirstName}, LastName: {employee1.LastName}, " +
-        //            $"HireDate: {employee1.HireDate}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
-
-        // Histories
-        var history = new History();
-
-        //var getAllHistory = history.GetAll();
-        //if (getAllHistory.Count > 0)
-        //{
-        //    foreach (var history1 in getAllHistory)
-        //    {
-        //        Console.WriteLine($"Id: {history1.StartDate}, EmployeeId: " +
-        //            $"{history1.EmployeeId}, EndDate: {history1.EndDate}, " +
-        //            $"JobId: {history1.JobId}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
-
-        // Jobs
-        //var job = new Job();
-
-        //var getAllJob = job.GetAll();
-        //if (getAllJob.Count > 0)
-        //{
-        //    foreach (var job1 in getAllJob)
-        //    {
-        //        Console.WriteLine($"Id: {job1.Id}, Title: " +
-        //            $"{job1.Title}, MinSalary: {job1.MinSalary}, " +
-        //            $"MaxSalary: {job1.MaxSalary}");
-        //    }
-        //}
-        //else
-        //{
-        //    Console.WriteLine("No data found");
-        //}
-
-
+            default:
+                Console.WriteLine("Invalid choice");
+                break;
+        }
+        return true;
     }
 
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +13,20 @@ public class Country
     public int RegionId { get; set; }
 
     // GET ALL Country
+    public override string ToString()
+    {
+        return $"{Id} - {Name} - {RegionId}";
+    }
+
+    // GET ALL Country
     public List<Country> GetAll()
     {   // inisialisasi countries untuk list object Country
         var countries = new List<Country>();
+
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM countries"; // Query Select tabel countrys
@@ -49,8 +55,6 @@ public class Country
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            // mereturn list kosong
-            return new List<Country>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
@@ -64,63 +68,56 @@ public class Country
     public Country GetById(string id)
     {   // inisialisasi country
         var country = new Country();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM countries WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel countries
-                {   // memasukkan data ke objek country
-                    country.Id = reader.GetString(0);
-                    country.Name = reader.GetString(1);
-                    country.RegionId = reader.GetInt32(2);
-                    reader.Close(); // menutup datareader atau reader
-                    connection.Close(); // tutup koneksi
-
-                    return country; //mereturn objek country
-                }
-
+                reader.Read();
+                country.Id = reader.GetString(0);
+                country.Name = reader.GetString(1);
+                country.RegionId = reader.GetInt32(2);
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            return null; //mereturn null
+            return country; //mereturn null
         }
         catch (Exception ex)
         {    // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return null; //mereturn null
+        return new Country(); //mereturn null
     }
     // INSERT: Country
     public string Insert(string id, string name, int regionId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "INSERT INTO countries VALUES (@id, @name, @region_id);"; // Query @name=>parameter
 
         try
         {   // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@region_id", regionId));
+            command.Parameters.Add(Provider.SetParameter("@region_id", regionId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -148,10 +145,10 @@ public class Country
     // UPDATE: Country
     public string Update(string id, string name, int regionId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "UPDATE countries SET name=@name, region_id= WHERE id=@id;"; // Query
@@ -159,11 +156,11 @@ public class Country
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
             // Mengisi parameter @region_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@region_id", regionId));
+            command.Parameters.Add(Provider.SetParameter("@region_id", regionId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -191,16 +188,16 @@ public class Country
     // DELETE: Country
     public string Delete(string id)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM countries WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,10 +20,10 @@ public class Location
     public List<Location> GetAll()
     {   // inisialisasi locations untuk list object Location
         var locations = new List<Location>();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM locations"; // Query Select tabel locations
@@ -71,17 +70,17 @@ public class Location
     public Location GetById(int id)
     {   // inisialisasi locations
         var location = new Location();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM locations WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
@@ -117,10 +116,10 @@ public class Location
     public string Insert
         (int id, string streetAddress, string postalCode, string city, string stateProvince, string countryId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = 
@@ -128,17 +127,17 @@ public class Location
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @street_address ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@street_address", streetAddress));
+            command.Parameters.Add(Provider.SetParameter("@street_address", streetAddress));
             // Mengisi parameter @postal_code ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@postal_code", postalCode));
+            command.Parameters.Add(Provider.SetParameter("@postal_code", postalCode));
             // Mengisi parameter @city ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@city", city));
+            command.Parameters.Add(Provider.SetParameter("@city", city));
             // Mengisi parameter @state_province ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@state_province", stateProvince));
+            command.Parameters.Add(Provider.SetParameter("@state_province", stateProvince));
             // Mengisi parameter @country_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@country_id", countryId));
+            command.Parameters.Add(Provider.SetParameter("@country_id", countryId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -167,10 +166,10 @@ public class Location
     public string Update
         (int id, string streetAddress, string postalCode, string city, string stateProvince, string countryId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText =
@@ -179,17 +178,17 @@ public class Location
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @street_address ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@street_address", streetAddress));
+            command.Parameters.Add(Provider.SetParameter("@street_address", streetAddress));
             // Mengisi parameter @postal_code ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@postal_code", postalCode));
+            command.Parameters.Add(Provider.SetParameter("@postal_code", postalCode));
             // Mengisi parameter @city ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@city", city));
+            command.Parameters.Add(Provider.SetParameter("@city", city));
             // Mengisi parameter @state_province ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@state_province", stateProvince));
+            command.Parameters.Add(Provider.SetParameter("@state_province", stateProvince));
             // Mengisi parameter @country_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@country_id", countryId));
+            command.Parameters.Add(Provider.SetParameter("@country_id", countryId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -218,15 +217,16 @@ public class Location
     public string Delete(int id)
     {
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
+        // inisialiasi command  
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM locations WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

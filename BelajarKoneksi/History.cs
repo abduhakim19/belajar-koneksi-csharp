@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,9 +18,10 @@ public class History
     {   // inisialisasi history untuk list object History
         var histories = new List<History>();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
+        // inisialiasi command  
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM histories"; // Query Select tabel regions
@@ -67,10 +67,10 @@ public class History
     public History GetByDateAndEmployeeId(DateTime startDate, int employeeId)
     {   // inisialisasi region
         var history = new History();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM histories WHERE " +
@@ -78,9 +78,9 @@ public class History
 
         try
         {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            command.Parameters.Add(Provider.SetParameter("@start_date", startDate));
             // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            command.Parameters.Add(Provider.SetParameter("@employee_id", employeeId));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
@@ -115,10 +115,10 @@ public class History
     public string Insert
         (DateTime startDate, int employeeId, DateTime endDate, int  departmentId, int jobId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "INSERT INTO histories VALUES (" +
@@ -126,15 +126,15 @@ public class History
 
         try
         {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            command.Parameters.Add(Provider.SetParameter("@start_date", startDate));
             // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            command.Parameters.Add(Provider.SetParameter("@employee_id", employeeId));
             // Mengisi parameter @end_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@end_date", endDate));
+            command.Parameters.Add(Provider.SetParameter("@end_date", endDate));
             // Mengisi parameter @department_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            command.Parameters.Add(Provider.SetParameter("@department_id", departmentId));
             // Mengisi parameter @job_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@job_id", jobId));
+            command.Parameters.Add(Provider.SetParameter("@job_id", jobId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -163,10 +163,10 @@ public class History
     public string Update
         (DateTime startDate, int employeeId, DateTime endDate, int departmentId, int jobId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "UPDATE histories SET " +
@@ -176,15 +176,15 @@ public class History
         try
         {
             // Mengisi parameter @start_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            command.Parameters.Add(Provider.SetParameter("@start_date", startDate));
             // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            command.Parameters.Add(Provider.SetParameter("@employee_id", employeeId));
             // Mengisi parameter @end_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@end_date", endDate));
+            command.Parameters.Add(Provider.SetParameter("@end_date", endDate));
             // Mengisi parameter @department_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            command.Parameters.Add(Provider.SetParameter("@department_id", departmentId));
             // Mengisi parameter @job_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@job_id", jobId));
+            command.Parameters.Add(Provider.SetParameter("@job_id", jobId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -212,18 +212,18 @@ public class History
     // DELETE: History
     public string Delete(DateTime startDate, int employeeId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM histories WHERE start_date=@start_date AND employee_id=@employee_id;"; // Query
         try
         {   // Mengisi parameter @start_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@start_date", startDate));
+            command.Parameters.Add(Provider.SetParameter("@start_date", startDate));
             // Mengisi parameter @employee_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@employee_id", employeeId));
+            command.Parameters.Add(Provider.SetParameter("@employee_id", employeeId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

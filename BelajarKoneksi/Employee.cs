@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Security.Cryptography;
 
@@ -26,10 +25,10 @@ public class Employee
     public List<Employee> GetAll()
     {   // inisialisasi employees untuk list object Employee
         var employees = new List<Employee>();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM employees"; // Query Select tabel regions
@@ -81,17 +80,17 @@ public class Employee
     public Employee GetById(int id)
     {   // inisialisasi employee
         var employee = new Employee();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM employees WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
@@ -132,10 +131,10 @@ public class Employee
     public string Insert
         (int id, string firstName, string lastName, string email, string phoneNumber, DateTime hireDate, SqlInt16 salary, decimal comissionPct, int managerId, int jobId, int departmentId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText =
@@ -144,27 +143,27 @@ public class Employee
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @first_name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@first_name", firstName));
+            command.Parameters.Add(Provider.SetParameter("@first_name", firstName));
             // Mengisi parameter @last_name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@last_name", lastName));
+            command.Parameters.Add(Provider.SetParameter("@last_name", lastName));
             // Mengisi parameter @email ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@email", email));
+            command.Parameters.Add(Provider.SetParameter("@email", email));
             // Mengisi parameter @phone_number ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@phone_number", phoneNumber));
+            command.Parameters.Add(Provider.SetParameter("@phone_number", phoneNumber));
             // Mengisi parameter @hire_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@hire_date", hireDate));
+            command.Parameters.Add(Provider.SetParameter("@hire_date", hireDate));
             // Mengisi parameter @salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@salary", salary));
+            command.Parameters.Add(Provider.SetParameter("@salary", salary));
             // Mengisi parameter @commision_pct ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@commision_pct", comissionPct));
+            command.Parameters.Add(Provider.SetParameter("@commision_pct", comissionPct));
             // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
+            command.Parameters.Add(Provider.SetParameter("@manager_id", managerId));
             // Mengisi parameter @job_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@job_id", jobId));
+            command.Parameters.Add(Provider.SetParameter("@job_id", jobId));
             // Mengisi parameter @department_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            command.Parameters.Add(Provider.SetParameter("@department_id", departmentId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -193,10 +192,10 @@ public class Employee
     public string Update
         (int id, string firstName, string lastName, string email, string phoneNumber, DateTime hireDate, SqlInt16 salary, decimal comissionPct, int managerId, int jobId, int departmentId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "UPDATE employees SET " +
@@ -207,27 +206,27 @@ public class Employee
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @first_name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@first_name", firstName));
+            command.Parameters.Add(Provider.SetParameter("@first_name", firstName));
             // Mengisi parameter @last_name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@last_name", lastName));
+            command.Parameters.Add(Provider.SetParameter("@last_name", lastName));
             // Mengisi parameter @email ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@email", email));
+            command.Parameters.Add(Provider.SetParameter("@email", email));
             // Mengisi parameter @phone_number ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@phone_number", phoneNumber));
+            command.Parameters.Add(Provider.SetParameter("@phone_number", phoneNumber));
             // Mengisi parameter @hire_date ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@hire_date", hireDate));
+            command.Parameters.Add(Provider.SetParameter("@hire_date", hireDate));
             // Mengisi parameter @salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@salary", salary));
+            command.Parameters.Add(Provider.SetParameter("@salary", salary));
             // Mengisi parameter @commision_pct ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@commision_pct", comissionPct));
+            command.Parameters.Add(Provider.SetParameter("@commision_pct", comissionPct));
             // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
+            command.Parameters.Add(Provider.SetParameter("@manager_id", managerId));
             // Mengisi parameter @job_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@job_id", jobId));
+            command.Parameters.Add(Provider.SetParameter("@job_id", jobId));
             // Mengisi parameter @department_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@department_id", departmentId));
+            command.Parameters.Add(Provider.SetParameter("@department_id", departmentId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -255,16 +254,16 @@ public class Employee
     // DELETE: Employee
     public string Delete(int id)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM employees WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi

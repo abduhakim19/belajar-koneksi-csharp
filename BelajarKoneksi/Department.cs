@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +16,10 @@ public class Department
     public List<Department> GetAll()
     {   // inisialisasi departments untuk list object Department
         var departments = new List<Department>();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM departments"; // Query Select tabel regions
@@ -65,17 +64,17 @@ public class Department
     public Department GetById(int id)
     {   // inisialisasi department
         var department = new Department();
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "SELECT * FROM departments WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open();// Buka Koneksi
             using var reader = command.ExecuteReader();// mengeksekusi query dan return data atau melakukan datareader
@@ -109,10 +108,10 @@ public class Department
     public string Insert
         (int id, string name, int locationId, int managerId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = 
@@ -120,13 +119,13 @@ public class Department
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
             // Mengisi parameter @location_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@location_id", locationId));
+            command.Parameters.Add(Provider.SetParameter("@location_id", locationId));
             // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
+            command.Parameters.Add(Provider.SetParameter("@manager_id", managerId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -155,10 +154,10 @@ public class Department
     public string Update
         (int id, string name, int locationId, int managerId)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText =
@@ -167,13 +166,13 @@ public class Department
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
             // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", name));
             // Mengisi parameter @location_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@location_id", locationId));
+            command.Parameters.Add(Provider.SetParameter("@location_id", locationId));
             // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@manager_id", managerId));
+            command.Parameters.Add(Provider.SetParameter("@manager_id", managerId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -201,16 +200,16 @@ public class Department
     // DELETE: Department
     public string Delete(int id)
     {
+        // inisialisasi koneksi
+        var connection = Provider.GetConnection();
         // inisialiasi command  
-        using var command = new SqlCommand();
-        // inisialisasi connection untuk koneksi ke database
-        var connection = DatabaseManager.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
         command.CommandText = "DELETE FROM departments WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(new SqlParameter("@id", id));
+            command.Parameters.Add(Provider.SetParameter("@id", id));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
