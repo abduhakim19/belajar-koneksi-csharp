@@ -89,7 +89,7 @@ public class Program
                 var getCountry8 = country8.GetAll();
                 var getRegion8 = region8.GetAll();
                 // linq 
-                var employeeJoin = (from e in getEmployee8
+                var employeeJoin = (from e in getEmployee8 // e alias dari Employee
                                     join d in getDepartment8 on e.DepartmentId equals d.Id // join department
                                     join l in getLocation8 on d.LocationId equals l.Id // join location
                                     join c in getCountry8 on l.CountryId equals c.Id // join country
@@ -123,7 +123,7 @@ public class Program
                             group e by e.DepartmentId into g
                             join d in getDepartment9 on g.Key equals d.Id
                             where g.Count() > 3 // mengecek departemetn dengan total employee lebih dari 3
-                            select new DepartmentAndSalaryVM
+                            select new EmployeeAndDepartmentVM
                             {
                                 DepartmentName = d.Name, // dari join department
                                 TotalEmployee = g.Count(), // total employee berdasarkan DepartmentId

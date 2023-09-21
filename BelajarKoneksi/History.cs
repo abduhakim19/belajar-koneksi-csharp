@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace BelajarKoneksi;
 public class History
@@ -12,6 +13,11 @@ public class History
     public DateTime EndDate { get; set; }
     public int DepartmentId  { get; set; }
     public string JobId { get; set; }
+
+    public override string ToString()
+    {
+        return $"{StartDate} - {EmployeeId} - {EndDate} - {DepartmentId} - {JobId}";
+    }
 
     // GET ALL History
     public List<History> GetAll()

@@ -15,7 +15,10 @@ public class Location
     public string StateProvince { get; set; }
     public string CountryId { get; set; }
 
-
+    public override string ToString()
+    {
+        return $"{Id} - {StreetAddress} - {PostalCode} - {City} - {StateProvince} - {CountryId}";
+    }
     // GET ALL Location
     public List<Location> GetAll()
     {   // inisialisasi locations untuk list object Location

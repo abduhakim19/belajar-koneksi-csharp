@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public class DepartmentAndSalaryVM
+public class EmployeeAndDepartmentVM
 {   // attribut
     public string DepartmentName { get; set; }
     public int TotalEmployee { get; set; }

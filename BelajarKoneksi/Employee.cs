@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlTypes;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace BelajarKoneksi;
 public class Employee
@@ -20,6 +21,11 @@ public class Employee
     public int ManagerId { get; set; }
     public string JobId { get; set; }
     public int DepartmentId { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Id} - {FirstName} - {LastName} - {Email} - {PhoneNumber} - {HireDate} - {Salary} - {ComissionPct} - {ManagerId} - {JobId} - {DepartmentId}";
+    }
 
     // GET ALL Employee
     public List<Employee> GetAll()

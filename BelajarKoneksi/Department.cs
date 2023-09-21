@@ -12,6 +12,11 @@ public class Department
     public int LocationId { get; set; }
     public int ManagerId { get; set; }
 
+    public override string ToString()
+    {
+        return $"{Id} - {Name} - {LocationId} - {ManagerId}";
+    }
+
     // GET ALL Department
     public List<Department> GetAll()
     {   // inisialisasi departments untuk list object Department
