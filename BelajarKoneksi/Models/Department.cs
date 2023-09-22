@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace BelajarKoneksi;
-public class Job
+namespace BelajarKoneksi.Models;
+public class Department
 {
-    public string Id { get; set; }
-    public string Title { get; set; }
-    public int MinSalary { get; set; }
-    public int MaxSalary { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int LocationId { get; set; }
+    public int ManagerId { get; set; }
 
     public override string ToString()
     {
-        return $"{Id} - {Title} - {MinSalary} - {MaxSalary}";
+        return $"{Id} - {Name} - {LocationId} - {ManagerId}";
     }
 
-    // GET ALL Job
-    public List<Job> GetAll()
-    {   // inisialisasi jobs untuk list object Job
-        var jobs = new List<Job>();
+    // GET ALL Department
+    public List<Department> GetAll()
+    {   // inisialisasi departments untuk list object Department
+        var departments = new List<Department>();
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM jobs"; // Query Select tabel jobs
+        command.CommandText = "SELECT * FROM departments"; // Query Select tabel regions
 
         try
         {
@@ -39,45 +37,45 @@ public class Job
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel jobs
-                {   // menambahkan jobs dari tabel ke list
-                    jobs.Add(new Job
+                while (reader.Read()) // loping data dari tabel departments
+                {   // menambahkan department dari tabel ke list
+                    departments.Add(new Department
                     {
-                        Id = reader.GetString(0),
-                        Title = reader.GetString(1),
-                        MinSalary = reader.GetInt32(2),
-                        MaxSalary = reader.GetInt32(3)
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        LocationId = reader.GetInt32(0),
+                        ManagerId = reader.GetInt32(0),
                     });
                 }
                 reader.Close(); // menutup datareader atau reader
                 connection.Close(); // tutup koneksi
 
-                return jobs; // mereturn list jobs
+                return departments; // mereturn list departments
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
             // mereturn list  kosong
-            return new List<Job>();
+            return new List<Department>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new List<Job>(); // mereturn list kosong
+        return new List<Department>(); // mereturn list kosong
 
     }
 
-    // GET BY ID: Job
-    public Job GetById(int id)
-    {   // inisialisasi job
-        var job = new Job();
+    // GET BY ID: Department
+    public Department GetById(int id)
+    {   // inisialisasi department
+        var department = new Department();
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM jobs WHERE id=@id;"; // Query
+        command.CommandText = "SELECT * FROM departments WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
@@ -88,32 +86,25 @@ public class Job
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel jobs
-                {   // memasukkan data ke objek job
-                    job.Id = reader.GetString(0);
-                    job.Title = reader.GetString(1);
-                    job.MinSalary = reader.GetInt32(2);
-                    job.MaxSalary = reader.GetInt32(3);
-                    reader.Close(); // menutup datareader atau reader
-                    connection.Close(); // tutup koneksi
-
-                    return job; //mereturn objek job
-                }
+                reader.Read();
+                department.Id = reader.GetInt32(0);
+                department.Name = reader.GetString(1);
+                department.LocationId = reader.GetInt32(2);
+                department.ManagerId = reader.GetInt32(3);
 
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            return null; //mereturn null
+            return department; //mereturn null
         }
         catch (Exception ex)
         {    // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return null; //mereturn null
+        return new Department(); //mereturn null
     }
-    // INSERT: Job
-    public string Insert
-        (string id, string title, string minSalary, string maxSalary)
+    // INSERT: Department
+    public string Insert(Department department)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
@@ -121,17 +112,18 @@ public class Job
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "INSERT INTO jobs VALUES (@id, @title, @min_salary, @max_salary);"; // Query
+        command.CommandText =
+            "INSERT INTO departments VALUES (@id, @name, @location_id, @manager_id);"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@id", id));
-            // Mengisi parameter @title ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@title", title));
-            // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@min_salary", minSalary));
-            // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@max_salary", maxSalary));
+            command.Parameters.Add(Provider.SetParameter("@id", department.Id));
+            // Mengisi parameter @name ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@name", department.Name));
+            // Mengisi parameter @location_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@location_id", department.LocationId));
+            // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@manager_id", department.ManagerId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -156,9 +148,8 @@ public class Job
             return $"Error: {ex.Message}";
         }
     }
-    // UPDATE: Job
-    public string Update
-        (string id, string title, string minSalary, string maxSalary)
+    // UPDATE: Department
+    public string Update(Department department)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
@@ -166,18 +157,19 @@ public class Job
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "UPDATE jobs SET title=@title, min_salary=@min_salary, max_salary=@max_salary  WHERE id=@id;"; // Query
+        command.CommandText =
+            "UPDATE departments SET name=@name,location_id=@location_id, manager_id=@manager_id WHERE id=@id;"; // Query
 
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@id", id));
-            // Mengisi parameter @title ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@title", title));
-            // Mengisi parameter @min_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@min_salary", minSalary));
-            // Mengisi parameter @max_salary ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@max_salary", maxSalary));
+            command.Parameters.Add(Provider.SetParameter("@id", department.Id));
+            // Mengisi parameter @name ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@name", department.Name));
+            // Mengisi parameter @location_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@location_id", department.LocationId));
+            // Mengisi parameter @manager_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@manager_id", department.ManagerId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -202,9 +194,8 @@ public class Job
             return $"Error: {ex.Message}";
         }
     }
-    // DELETE: Job
-    public string Delete
-        (string id)
+    // DELETE: Department
+    public string Delete(int id)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
@@ -212,7 +203,7 @@ public class Job
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "DELETE FROM jobs WHERE id=@id;"; // Query
+        command.CommandText = "DELETE FROM departments WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(Provider.SetParameter("@id", id));
@@ -241,4 +232,3 @@ public class Job
         }
     }
 }
-

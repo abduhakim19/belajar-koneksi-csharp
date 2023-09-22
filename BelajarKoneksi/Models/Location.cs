@@ -1,30 +1,35 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace BelajarKoneksi;
-
-public class Region
+namespace BelajarKoneksi.Models;
+public class Location
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string StreetAddress { get; set; }
+    public string PostalCode { get; set; }
+    public string City { get; set; }
+    public string StateProvince { get; set; }
+    public string CountryId { get; set; }
 
     public override string ToString()
     {
-        return $"{Id} - {Name}";
+        return $"{Id} - {StreetAddress} - {PostalCode} - {City} - {StateProvince} - {CountryId}";
     }
-
-    // GET ALL Region
-    public List<Region> GetAll()
-    {   // inisialisasi regions untuk list object Region
-        var regions = new List<Region>();
+    // GET ALL Location
+    public List<Location> GetAll()
+    {   // inisialisasi locations untuk list object Location
+        var locations = new List<Location>();
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions"; // Query Select tabel regions
+        command.CommandText = "SELECT * FROM locations"; // Query Select tabel locations
 
         try
         {
@@ -34,41 +39,47 @@ public class Region
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel regions
-                {   // menambahkan region dari tabel ke list
-                    regions.Add(new Region
+                while (reader.Read()) // loping data dari tabel locations
+                {   // menambahkan locations dari tabel ke list
+                    locations.Add(new Location
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1)
+                        StreetAddress = reader.GetString(1),
+                        PostalCode = reader.GetString(2),
+                        City = reader.GetString(3),
+                        StateProvince = reader.GetString(4),
+                        CountryId = reader.GetString(5),
                     });
                 }
                 reader.Close(); // menutup datareader atau reader
                 connection.Close(); // tutup koneksi
 
-                return regions; // mereturn list regions
+                return locations; // mereturn list locations
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
+            // mereturn list  kosong
+            return new List<Location>();
         }
         catch (Exception ex)
         {   // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new List<Region>(); // mereturn list kosong
+        return new List<Location>(); // mereturn list kosong
 
     }
 
-    // GET BY ID: Region
-    public Region GetById(int id)
-    {   // inisialisasi region
-        var region = new Region();
+    // GET BY ID: Location
+    public Location GetById(int id)
+    {   // inisialisasi locations
+        var location = new Location();
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "SELECT * FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "SELECT * FROM locations WHERE id=@id;"; // Query
 
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
@@ -80,33 +91,49 @@ public class Region
             if (reader.HasRows)
             {
                 reader.Read();
-                region.Id = reader.GetInt32(0);
-                region.Name = reader.GetString(1);
-                reader.Close(); // menutup datareader atau reader
-
+                // memasukkan data ke objek location
+                location.Id = reader.GetInt32(0);
+                location.StreetAddress = reader.GetString(1);
+                location.PostalCode = reader.GetString(1);
+                location.City = reader.GetString(1);
+                location.StateProvince = reader.GetString(1);
+                location.CountryId = reader.GetString(1);
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            return region; //mereturn objek region
+            return location; //mereturn objek location
         }
         catch (Exception ex)
         {    // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return new Region(); //mereturn objek region kosong
+        return new Location(); //mereturn objek Location kosong
     }
-    // INSERT: Region
-    public string Insert(string name)
+    // INSERT: Location
+    public string Insert(Location location)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
-        command.CommandText = "INSERT INTO regions VALUES (@name);"; // Query
+
+        command.Connection = connection; // menghubungkan command dan database 
+        command.CommandText =
+            "INSERT INTO locations VALUES (@id, @street_address, @postal_code, @city, @state_province, @country_id);"; // Query
 
         try
-        {   // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@name", name));
+        {   // Mengisi parameter @id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@id", location.Id));
+            // Mengisi parameter @street_address ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@street_address", location.StreetAddress));
+            // Mengisi parameter @postal_code ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@postal_code", location.PostalCode));
+            // Mengisi parameter @city ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@city", location.City));
+            // Mengisi parameter @state_province ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@state_province", location.StateProvince));
+            // Mengisi parameter @country_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@country_id", location.CountryId));
 
             connection.Open(); // buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -131,8 +158,8 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // UPDATE: Region
-    public string Update(int id, string name)
+    // UPDATE: Location
+    public string Update(Location location)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
@@ -140,15 +167,23 @@ public class Region
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "UPDATE regions SET name=@name WHERE id=@id;"; // Query
+        command.CommandText =
+            "UPDATE locations SET street_address=@street_address, postal_code=@postal_code, city=@city, state_province=@state_province, country_id=@country_id  WHERE id=@id;"; // Query
 
         try
         {
             // Mengisi parameter @id ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@id", id));
-
-            // Mengisi parameter @name ke query yang sudah dibuat diatas
-            command.Parameters.Add(Provider.SetParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@id", location.Id));
+            // Mengisi parameter @street_address ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@street_address", location.StreetAddress));
+            // Mengisi parameter @postal_code ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@postal_code", location.PostalCode));
+            // Mengisi parameter @city ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@city", location.City));
+            // Mengisi parameter @state_province ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@state_province", location.StateProvince));
+            // Mengisi parameter @country_id ke query yang sudah dibuat diatas
+            command.Parameters.Add(Provider.SetParameter("@country_id", location.CountryId));
 
             connection.Open(); //buka koneksi
             using var transaction = connection.BeginTransaction(); //inisialisasi transaksi
@@ -173,16 +208,17 @@ public class Region
             return $"Error: {ex.Message}";
         }
     }
-    // DELETE: Region
+    // DELETE: Location
     public string Delete(int id)
     {
+        // inisialiasi command  
         // inisialisasi koneksi
         var connection = Provider.GetConnection();
         // inisialiasi command  
         using var command = Provider.GetCommand();
 
         command.Connection = connection; // menghubungkan command dan database 
-        command.CommandText = "DELETE FROM regions WHERE id=@id;"; // Query
+        command.CommandText = "DELETE FROM locations WHERE id=@id;"; // Query
         try
         {   // Mengisi parameter @id ke query yang sudah dibuat diatas
             command.Parameters.Add(Provider.SetParameter("@id", id));

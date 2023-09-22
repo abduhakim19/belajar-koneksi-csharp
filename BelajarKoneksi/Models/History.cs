@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace BelajarKoneksi;
+namespace BelajarKoneksi.Models;
 public class History
 {
     public DateTime StartDate { get; set; }
     public int EmployeeId { get; set; }
     public DateTime EndDate { get; set; }
-    public int DepartmentId  { get; set; }
+    public int DepartmentId { get; set; }
     public string JobId { get; set; }
 
     public override string ToString()
@@ -93,33 +93,27 @@ public class History
             // Cek ada data atau tidak
             if (reader.HasRows)
             {
-                while (reader.Read()) // loping data dari tabel histories
-                {   // memasukkan data ke objek histries
-                    history.StartDate = reader.GetDateTime(0);
-                    history.EmployeeId = reader.GetInt32(1);
-                    history.EndDate = reader.GetDateTime(2);
-                    history.DepartmentId = reader.GetInt32(3);
-                    history.JobId = reader.GetString(4);
-                    reader.Close(); // menutup datareader atau reader
-                    connection.Close(); // tutup koneksi
-
-                    return history; //mereturn objek history
-                }
-
+                reader.Read();
+                // memasukkan data ke objek histries
+                history.StartDate = reader.GetDateTime(0);
+                history.EmployeeId = reader.GetInt32(1);
+                history.EndDate = reader.GetDateTime(2);
+                history.DepartmentId = reader.GetInt32(3);
+                history.JobId = reader.GetString(4);
             }
             reader.Close(); // menutup datareader atau reader
             connection.Close(); // tutup koneksi
-            return null; //mereturn null
+            return history; //mereturn objek history
         }
         catch (Exception ex)
         {    // Error Handling jika terdapat error
             Console.WriteLine($"Error: {ex.Message}");
         }
-        return null; //mereturn null
+        return new History(); //mereturn null
     }
     // INSERT: History
     public string Insert
-        (DateTime startDate, int employeeId, DateTime endDate, int  departmentId, int jobId)
+        (DateTime startDate, int employeeId, DateTime endDate, int departmentId, int jobId)
     {
         // inisialisasi koneksi
         var connection = Provider.GetConnection();

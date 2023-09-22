@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BelajarKoneksi;
+namespace BelajarKoneksi.ViewModels;
 public class EmployeeVM
 {
     // attribut
