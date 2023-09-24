@@ -40,8 +40,6 @@ public class Program
     
     public static bool Menu(string input)
     {
-
-        
         bool isInputInt;
         switch (input)
         {
@@ -353,7 +351,7 @@ public class Program
         listEmployeeController.GetAll();
 
     }
-
+    // test in new laptop
     public static void EmployeeDepartment()
     {
         // Inisialisasi

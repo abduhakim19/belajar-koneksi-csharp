@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace BelajarKoneksi;
 public class Provider
 {
-    private static readonly string connectionString = "Data Source=HAKIM-COMPUTER;Database=db_hr_dts;Connect Timeout=30;Integrated Security=True";
+    private static readonly string connectionString = "Data Source=DESKTOP-17TERPO;Database=db_hr_dts;Connect Timeout=30;Integrated Security=True";
 
     public static SqlConnection GetConnection()
     {
